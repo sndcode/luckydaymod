@@ -12,7 +12,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 //
 using StardewValley.Menus;
-using StardewModdingAPI.Events;
 using System.Reflection;
 using System.Timers;
 
@@ -36,21 +35,13 @@ namespace luckydaymod
             this.Monitor.Log("=========================================", LogLevel.Info);
             this.Monitor.Log("How to use the luckyday mod version " + modversion , LogLevel.Info);
             this.Monitor.Log("Use config file to enable or disable the mod ", LogLevel.Info);
+            this.Monitor.Log("type command currentluck to view your current daily luck amount value", LogLevel.Info);
             this.Monitor.Log("=========================================", LogLevel.Info);
         }
 
         private void HandleDebugValuePrinter(object sender, EventArgsCommand e)
         {
             this.Monitor.Log("Current daily luck : " + Game1.dailyLuck.ToString(), LogLevel.Info);
-        }
-
-        private void check()
-        {
-            string gameversion = Game1.version;
-            if(gameversion != "1.11-Z_MODDED | SMAPI 1.1.1")
-            {
-                this.Monitor.Log("YOUR GAME VERSION (" + gameversion + ") IS NOT SUPPORTED!", LogLevel.Error);
-            }
         }
 
         private void ReceiveKeyPress(object sender, EventArgsKeyPressed e)
@@ -63,17 +54,34 @@ namespace luckydaymod
             {
                 Game1.dailyLuck = 0.999;
             }
+            if (e.KeyPressed == Keys.NumPad3)
+            {
+                //Learn all professions
+                int i = 0;
+                while (i < 29)//Profession from 0 to 28
+                {
+                    Game1.player.professions.Add(i);
+                    this.Monitor.Log("Profession No. " + i + " learned !", LogLevel.Info);
+                    i++;
+                }
+
+            }
+
+
+
         }
 
-        private void GameEvents_OneSecondTick(object sender, EventArgs e)
+        private void GameEvents_OneSecondTick(object sender, EventArgs e)//TICK
         {
             if (Config.enable)
             {
                 Game1.dailyLuck = Config.luckvalue;
+                
             }
+
             if(Config.debugmode)
             {
-                //this.Monitor.Log("Current daily luck : " + Game1.dailyLuck.ToString(), LogLevel.Info);
+                this.Monitor.Log("Current daily luck : " + Game1.dailyLuck.ToString(), LogLevel.Info);
             }
         }
 
@@ -84,7 +92,6 @@ namespace luckydaymod
             GameEvents.OneSecondTick += this.GameEvents_OneSecondTick;
             Config = helper.ReadConfig<ModConfig>();
             ControlEvents.KeyPressed += this.ReceiveKeyPress;
-            check();
         }
     }
 }
